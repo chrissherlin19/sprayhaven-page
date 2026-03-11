@@ -1,0 +1,695 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SPRAY HAVEN — CASE FILE [CLASSIFIED]</title>
+<link href="https://fonts.googleapis.com/css2?family=Special+Elite&family=Share+Tech+Mono&family=IM+Fell+English:ital@0;1&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --ink: #1a1008;
+    --paper: #f0e8d5;
+    --paper-aged: #e8dcc0;
+    --paper-dark: #d4c49a;
+    --red-stamp: #8b1a1a;
+    --blue-stamp: #1a2e5c;
+    --manila: #c8a96e;
+    --desk: #2a1f0e;
+    --redaction: #111;
+    --field-note: #2b3a1e;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    background-color: var(--desk);
+    background-image: 
+      repeating-linear-gradient(
+        45deg,
+        transparent,
+        transparent 2px,
+        rgba(255,255,255,0.01) 2px,
+        rgba(255,255,255,0.01) 4px
+      );
+    font-family: 'Special Elite', serif;
+    min-height: 100vh;
+    padding: 60px 20px 120px;
+    overflow-x: hidden;
+  }
+
+  /* Desk texture strip at top */
+  body::before {
+    content: '';
+    position: fixed;
+    top: 0; left: 0; right: 0;
+    height: 8px;
+    background: repeating-linear-gradient(90deg, #1a0f05 0px, #3a2510 40px, #1a0f05 80px);
+    z-index: 100;
+  }
+
+  .stack {
+    max-width: 780px;
+    margin: 0 auto;
+    display: flex;
+    flex-direction: column;
+    gap: 0px;
+    position: relative;
+  }
+
+  /* === SHEET BASE === */
+  .sheet {
+    background: var(--paper);
+    position: relative;
+    padding: 52px 60px 48px;
+    box-shadow: 
+      0 4px 6px rgba(0,0,0,0.3),
+      0 8px 24px rgba(0,0,0,0.4),
+      inset 0 0 80px rgba(180,140,60,0.08);
+    margin-bottom: -12px;
+    border-left: 1px solid rgba(0,0,0,0.1);
+    border-right: 1px solid rgba(0,0,0,0.1);
+  }
+
+  /* Paper aging texture via pseudo */
+  .sheet::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: 
+      radial-gradient(ellipse at 20% 80%, rgba(160,120,40,0.06) 0%, transparent 60%),
+      radial-gradient(ellipse at 80% 20%, rgba(160,120,40,0.04) 0%, transparent 50%);
+    pointer-events: none;
+  }
+
+  .sheet-1 { transform: rotate(-0.4deg); background: #f2ebd8; z-index: 5; }
+  .sheet-2 { transform: rotate(0.6deg);  background: #eee6d0; z-index: 4; }
+  .sheet-3 { transform: rotate(-0.3deg); background: #f0e8d5; z-index: 3; }
+  .sheet-4 { transform: rotate(0.5deg);  background: #ede5ce; z-index: 2; background-image: repeating-linear-gradient(transparent, transparent 27px, rgba(0,0,0,0.06) 27px, rgba(0,0,0,0.06) 28px); }
+  .sheet-5 { transform: rotate(-0.2deg); background: #f1eadb; z-index: 1; }
+
+  /* Hole punches on some sheets */
+  .sheet-1::before, .sheet-3::before {
+    content: '';
+    position: absolute;
+    left: 22px;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 14px;
+    height: 14px;
+    border-radius: 50%;
+    background: var(--desk);
+    box-shadow: 0 0 0 2px rgba(0,0,0,0.2), inset 0 1px 2px rgba(0,0,0,0.4);
+  }
+
+  /* === HEADER BLOCK === */
+  .doc-header {
+    text-align: center;
+    border-bottom: 2px solid var(--ink);
+    padding-bottom: 18px;
+    margin-bottom: 24px;
+    position: relative;
+  }
+
+  .doc-agency {
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 9px;
+    letter-spacing: 4px;
+    color: var(--ink);
+    opacity: 0.7;
+    text-transform: uppercase;
+    margin-bottom: 4px;
+  }
+
+  .doc-title-main {
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 28px;
+    font-weight: bold;
+    letter-spacing: 8px;
+    color: var(--ink);
+    line-height: 1.1;
+  }
+
+  .doc-subtitle {
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 11px;
+    letter-spacing: 3px;
+    color: var(--ink);
+    opacity: 0.8;
+    margin-top: 6px;
+  }
+
+  /* === STAMPS === */
+  .stamp {
+    position: absolute;
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 13px;
+    letter-spacing: 3px;
+    font-weight: bold;
+    text-transform: uppercase;
+    padding: 5px 10px;
+    border: 3px solid currentColor;
+    border-radius: 3px;
+    opacity: 0.75;
+    transform-origin: center;
+    pointer-events: none;
+  }
+
+  .stamp-red { color: var(--red-stamp); transform: rotate(-12deg); }
+  .stamp-blue { color: var(--blue-stamp); transform: rotate(8deg); }
+  .stamp-diag { color: var(--red-stamp); transform: rotate(18deg); font-size: 16px; opacity: 0.55; }
+
+  /* === CASE META TABLE === */
+  .meta-grid {
+    display: grid;
+    grid-template-columns: auto 1fr;
+    gap: 3px 20px;
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 11px;
+    margin-bottom: 22px;
+    border: 1px solid rgba(0,0,0,0.15);
+    padding: 14px 16px;
+    background: rgba(0,0,0,0.03);
+  }
+
+  .meta-label { color: var(--ink); opacity: 0.6; white-space: nowrap; font-weight: bold; }
+  .meta-value { color: var(--ink); }
+
+  /* === SECTION HEADERS === */
+  .section-head {
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 5px;
+    text-transform: uppercase;
+    color: var(--ink);
+    opacity: 0.55;
+    border-bottom: 1px solid rgba(0,0,0,0.2);
+    padding-bottom: 4px;
+    margin: 24px 0 12px;
+  }
+
+  /* === BODY TEXT === */
+  .doc-body {
+    font-family: 'Special Elite', serif;
+    font-size: 14px;
+    line-height: 1.75;
+    color: var(--ink);
+  }
+
+  .doc-body p { margin-bottom: 14px; }
+
+  /* === FIELD NOTES === */
+  .field-note {
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 11.5px;
+    line-height: 1.65;
+    color: var(--field-note);
+    background: rgba(43,58,30,0.06);
+    border-left: 3px solid var(--field-note);
+    padding: 10px 14px;
+    margin: 14px 0;
+  }
+
+  .field-note-label {
+    font-weight: bold;
+    letter-spacing: 1px;
+    opacity: 0.7;
+    font-size: 10px;
+    margin-bottom: 4px;
+  }
+
+  /* === REDACTION === */
+  .redacted {
+    background: var(--redaction);
+    color: transparent;
+    user-select: none;
+    border-radius: 1px;
+    padding: 0 2px;
+    display: inline-block;
+  }
+
+  /* === THREAT BADGE === */
+  .threat-badge {
+    display: inline-block;
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 2px;
+    border: 2px solid var(--red-stamp);
+    color: var(--red-stamp);
+    padding: 3px 8px;
+    margin-left: 8px;
+    vertical-align: middle;
+  }
+
+  /* === CREW LIST === */
+  .crew-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 11px;
+    margin: 12px 0;
+  }
+
+  .crew-table th {
+    text-align: left;
+    border-bottom: 2px solid var(--ink);
+    padding: 6px 10px;
+    letter-spacing: 2px;
+    opacity: 0.6;
+    font-size: 10px;
+  }
+
+  .crew-table td {
+    padding: 5px 10px;
+    border-bottom: 1px solid rgba(0,0,0,0.1);
+    vertical-align: top;
+  }
+
+  .crew-table tr:nth-child(even) td { background: rgba(0,0,0,0.025); }
+
+  .status-open { color: var(--red-stamp); font-weight: bold; }
+  .status-elevated { color: #5a3800; font-weight: bold; }
+
+  /* === STICKY NOTE === */
+  .sticky {
+    background: #f5e87a;
+    padding: 18px 20px;
+    transform: rotate(1.8deg);
+    box-shadow: 3px 4px 10px rgba(0,0,0,0.2);
+    font-family: 'IM Fell English', serif;
+    font-style: italic;
+    font-size: 14px;
+    line-height: 1.6;
+    color: #2a1e00;
+    position: relative;
+    margin: 20px auto;
+    max-width: 320px;
+  }
+
+  .sticky::before {
+    content: '';
+    position: absolute;
+    top: -10px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 30px;
+    height: 16px;
+    background: rgba(200,170,80,0.7);
+    border-radius: 2px;
+  }
+
+  /* === DOWNLOAD BLOCK === */
+  .checkout-block {
+    border: 2px solid var(--ink);
+    padding: 20px 24px;
+    margin-top: 24px;
+    position: relative;
+  }
+
+  .checkout-title {
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 4px;
+    opacity: 0.5;
+    margin-bottom: 12px;
+    text-transform: uppercase;
+  }
+
+  .checkout-line {
+    display: flex;
+    align-items: baseline;
+    gap: 10px;
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 12px;
+    margin-bottom: 8px;
+    border-bottom: 1px dotted rgba(0,0,0,0.25);
+    padding-bottom: 6px;
+  }
+
+  .checkout-label { opacity: 0.5; white-space: nowrap; min-width: 160px; }
+  .checkout-value { flex: 1; }
+
+  .checkout-sig {
+    margin-top: 16px;
+    font-family: 'IM Fell English', serif;
+    font-style: italic;
+    font-size: 20px;
+    border-bottom: 1px solid var(--ink);
+    padding-bottom: 4px;
+    width: 200px;
+    color: #1a1a5e;
+  }
+
+  /* === HANDWRITTEN ASIDE === */
+  .handwritten {
+    font-family: 'IM Fell English', serif;
+    font-style: italic;
+    font-size: 15px;
+    color: #1a1a5e;
+    margin: 10px 0;
+    line-height: 1.6;
+  }
+
+  /* === PHOTO PLACEHOLDER === */
+  .photo-block {
+    border: 2px solid rgba(0,0,0,0.25);
+    padding: 8px;
+    display: inline-block;
+    margin: 12px 0;
+    position: relative;
+    background: #ddd;
+  }
+
+  .photo-block img {
+    display: block;
+    max-width: 100%;
+    filter: contrast(1.1) brightness(0.95);
+  }
+
+  .photo-caption {
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 1px;
+    text-align: center;
+    color: rgba(0,0,0,0.5);
+    margin-top: 6px;
+  }
+
+  /* === CORNER FOLD === */
+  .sheet-2 .corner-fold {
+    position: absolute;
+    top: 0; right: 0;
+    width: 0; height: 0;
+    border-style: solid;
+    border-width: 0 32px 32px 0;
+    border-color: transparent var(--desk) transparent transparent;
+    filter: drop-shadow(-2px 2px 2px rgba(0,0,0,0.2));
+  }
+
+  /* === PAPER CLIP === */
+  .clip {
+    position: absolute;
+    top: -18px;
+    left: 80px;
+    width: 6px;
+    height: 50px;
+    border: 3px solid #aaa;
+    border-radius: 3px 3px 0 0;
+    border-bottom: none;
+    box-shadow: 2px 0 0 #ccc, -1px 1px 3px rgba(0,0,0,0.2);
+    transform: rotate(-2deg);
+    z-index: 10;
+  }
+
+  .clip::after {
+    content: '';
+    position: absolute;
+    bottom: -6px;
+    left: -3px;
+    right: -3px;
+    height: 10px;
+    border: 3px solid #aaa;
+    border-radius: 0 0 3px 3px;
+    border-top: none;
+    box-shadow: 2px 0 0 #ccc;
+  }
+
+  /* === FOOTER NOTE === */
+  .doc-footer {
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 9px;
+    letter-spacing: 3px;
+    text-align: center;
+    opacity: 0.4;
+    margin-top: 28px;
+    padding-top: 12px;
+    border-top: 1px solid rgba(0,0,0,0.15);
+  }
+
+  /* === HORIZONTAL RULE === */
+  hr.doc-rule {
+    border: none;
+    border-top: 1px solid rgba(0,0,0,0.2);
+    margin: 18px 0;
+  }
+
+  /* Scroll reveal animation */
+  .sheet {
+    animation: slideIn 0.5s ease both;
+  }
+  .sheet-1 { animation-delay: 0.05s; }
+  .sheet-2 { animation-delay: 0.15s; }
+  .sheet-3 { animation-delay: 0.25s; }
+  .sheet-4 { animation-delay: 0.35s; }
+  .sheet-5 { animation-delay: 0.45s; }
+
+  @keyframes slideIn {
+    from { opacity: 0; transform: translateY(12px) rotate(var(--rot, 0deg)); }
+    to   { opacity: 1; }
+  }
+
+  .sheet-1 { --rot: -0.4deg; }
+  .sheet-2 { --rot: 0.6deg; }
+  .sheet-3 { --rot: -0.3deg; }
+  .sheet-4 { --rot: 0.5deg; }
+  .sheet-5 { --rot: -0.2deg; }
+
+  @media (max-width: 600px) {
+    .sheet { padding: 32px 28px 36px; }
+    .doc-title-main { font-size: 20px; letter-spacing: 5px; }
+  }
+</style>
+</head>
+<body>
+
+<div class="stack">
+
+  <!-- ═══════════════════════════════════════════════
+       SHEET 1 — INCIDENT REPORT / COVER PAGE
+  ═══════════════════════════════════════════════ -->
+  <div class="sheet sheet-1">
+    <div class="clip"></div>
+
+    <div class="doc-header">
+      <div class="doc-agency">City of Spray Haven &nbsp;·&nbsp; Office of the Mayor — K. D. Markham</div>
+      <div class="doc-agency" style="margin-bottom:8px;">Art Suppression Squad &nbsp;·&nbsp; Field Intelligence Division</div>
+      <div class="doc-title-main">SPRAY HAVEN</div>
+      <div class="doc-subtitle">Mark Your Territory — Subject Case File</div>
+    </div>
+
+    <span class="stamp stamp-red" style="top:48px; right:60px;">CONFIDENTIAL</span>
+
+    <div class="meta-grid">
+      <span class="meta-label">Case No.:</span>        <span class="meta-value">ASS-0001-SH</span>
+      <span class="meta-label">Classification:</span>  <span class="meta-value">CONFIDENTIAL</span>
+      <span class="meta-label">Filed By:</span>        <span class="meta-value">Analyst T. Bryce // Badge 309</span>
+      <span class="meta-label">Status:</span>          <span class="meta-value status-open">OPEN — ACTIVE SUPPRESSION ONGOING</span>
+      <span class="meta-label">Threat Level:</span>    <span class="meta-value">ELEVATED <span class="threat-badge">MULTI-DISTRICT</span></span>
+      <span class="meta-label">Subject:</span>         <span class="meta-value">Ongoing unauthorized art activity — city-wide</span>
+    </div>
+
+    <div class="section-head">0 1 — S I T U A T I O N  S U M M A R Y</div>
+
+    <div class="doc-body">
+      <p>The city calls him Mayor K. D. Markham. You call him something else.</p>
+      <p>He has deployed the Art Suppression Squad to scrub Spray Haven clean — buffing walls, patrolling alleys, silencing crews. Thirteen active factions have been identified operating across fourteen districts. Each one plays by its own rules. None of them are playing by ours.</p>
+      <p>Paint runs deeper than policy. This city was built on rebellion, and the walls remember.</p>
+    </div>
+
+    <div class="field-note">
+      <div class="field-note-label">[FIELD NOTE — T. BRYCE]</div>
+      I have been asked to summarize the situation in one sentence for the Mayor's morning briefing. My one sentence: we are losing. I was told to try again. My second sentence: we are losing, but slower than last cycle. I submitted both. Only the second was included in the final briefing. I am including both in the official file.
+    </div>
+
+    <div class="doc-footer">CONFIDENTIAL — UNAUTHORIZED DISCLOSURE IS A VIOLATION OF CITY ORDINANCE 47-B</div>
+  </div>
+
+
+  <!-- ═══════════════════════════════════════════════
+       SHEET 2 — CREW THREAT MANIFEST
+  ═══════════════════════════════════════════════ -->
+  <div class="sheet sheet-2">
+    <div class="corner-fold"></div>
+    <span class="stamp stamp-blue" style="top:44px; right:55px;">FOR AUTHORIZED<br>PERSONNEL ONLY</span>
+
+    <div class="section-head">0 2 — K N O W N  A C T I V E  F A C T I O N S  /  T H R E A T  A S S E S S M E N T</div>
+
+    <div class="doc-body">
+      <p>Thirteen factions have been confirmed operating within city limits. Each demonstrates a distinct operational profile. Suppression resources have been allocated accordingly, with limited success across all fronts.</p>
+    </div>
+
+    <table class="crew-table">
+      <thead>
+        <tr>
+          <th>FACTION CODE</th>
+          <th>STREET NAME</th>
+          <th>THREAT PROFILE</th>
+          <th>STATUS</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>GT</td><td>Ghost Tags</td><td>Invisible first move. Heat-immune on entry.</td><td class="status-open">OPEN</td>
+        </tr>
+        <tr>
+          <td>HB</td><td>Hollow Boys</td><td>Profit from failure. Chaos tacticians.</td><td class="status-open">OPEN</td>
+        </tr>
+        <tr>
+          <td>BB</td><td>Bombardiers</td><td><span class="redacted">██████████████████</span></td><td class="status-open">OPEN</td>
+        </tr>
+        <tr>
+          <td>SC</td><td>Smog Crew</td><td>Thrive in heavily patrolled districts. <span class="redacted">████████</span></td><td class="status-elevated">ELEVATED</td>
+        </tr>
+        <tr>
+          <td>ZB</td><td>Zero Block</td><td>All-in early aggression. High volatility.</td><td class="status-open">OPEN</td>
+        </tr>
+        <tr>
+          <td>VC</td><td><span class="redacted">█████████████</span></td><td><span class="redacted">████████████████████████████</span></td><td class="status-open">OPEN</td>
+        </tr>
+        <tr>
+          <td>AR</td><td><span class="redacted">███████████</span></td><td><span class="redacted">████████████████</span> — see annexed file.</td><td class="status-elevated">ELEVATED</td>
+        </tr>
+        <tr>
+          <td colspan="4" style="text-align:center; opacity:0.4; font-style:italic; padding:10px;">
+            [ 6 ADDITIONAL FACTIONS — FILES ANNEXED / RESTRICTED ]
+          </td>
+        </tr>
+      </tbody>
+    </table>
+
+    <div class="field-note">
+      <div class="field-note-label">[FIELD NOTE — T. BRYCE]</div>
+      I have been asked why six faction files are restricted. The answer is: they are not restricted by me. I do not know who restricted them or when. When I asked my supervisor, she told me to focus on the files I have access to. I have noted this exchange in three separate reports. None of those reports are in this binder. I am noting that too.
+    </div>
+
+    <div class="doc-footer">CONFIDENTIAL — UNAUTHORIZED DISCLOSURE IS A VIOLATION OF CITY ORDINANCE 47-B</div>
+  </div>
+
+
+  <!-- ═══════════════════════════════════════════════
+       SHEET 3 — DISTRICT SURVEILLANCE MAP / NOTES
+  ═══════════════════════════════════════════════ -->
+  <div class="sheet sheet-3">
+    <span class="stamp stamp-diag" style="bottom: 80px; right: 50px; font-size:20px;">UNRESOLVED</span>
+
+    <div class="section-head">0 3 — D I S T R I C T  S U R V E I L L A N C E  N O T E S</div>
+
+    <div class="doc-body">
+      <p>Fourteen districts have been identified as active conflict zones. Each district presents a distinct operational environment — some shelter crews from heat, others amplify pressure. Selection of active districts is <span class="redacted">████████</span> each cycle, which means we cannot pre-position resources effectively.</p>
+      <p>We know about the rooftops of Crimson Heights. We know about the factories in Iron Row. The Underpass. The Storm Drains. The Night Market. The Memorial Plaza. We know what each district does to a crew that moves through it.</p>
+      <p>What we do not know is which fourteen will be active when it matters.</p>
+    </div>
+
+    <div class="field-note">
+      <div class="field-note-label">[FIELD NOTE — T. BRYCE // THE COMMUNITY GARDEN]</div>
+      I spent a Tuesday afternoon in the Garden. It is the only district where I have never recorded a Heat incident. Not because crews don't work here — they do. Because whatever they're doing here, it doesn't register as a threat. I filed this as "anomalous" twice. Both times it was reclassified as "insufficient data." I am including this note because I think the Garden is important and I think someone should pay attention to it.
+    </div>
+
+    <hr class="doc-rule">
+
+    <div class="section-head">0 4 — G A M E P L A Y  C L A S S I F I C A T I O N</div>
+
+    <div class="doc-body">
+      <p>The following parameters have been confirmed through field observation:</p>
+    </div>
+
+    <div class="meta-grid">
+      <span class="meta-label">Players:</span>         <span class="meta-value">2–5 (includes asymmetric Mayor Mode at 5)</span>
+      <span class="meta-label">Active Districts:</span> <span class="meta-value">14 unique — selected randomly each game</span>
+      <span class="meta-label">Active Factions:</span>  <span class="meta-value">13 asymmetric crews</span>
+      <span class="meta-label">Format:</span>           <span class="meta-value">Print & Play — Competitive Rulebook</span>
+      <span class="meta-label">Status:</span>           <span class="meta-value status-open">Work-in-Progress — Playtester Access OPEN</span>
+      <span class="meta-label">Cost:</span>             <span class="meta-value">Free to download. Tip optional.</span>
+    </div>
+
+    <div class="doc-footer">CONFIDENTIAL — UNAUTHORIZED DISCLOSURE IS A VIOLATION OF CITY ORDINANCE 47-B</div>
+  </div>
+
+
+  <!-- ═══════════════════════════════════════════════
+       SHEET 4 — HANDWRITTEN NOTE / PERSONAL
+  ═══════════════════════════════════════════════ -->
+  <div class="sheet sheet-4">
+    <div class="section-head">[ U N F I L E D  —  F O U N D  I N S I D E  C O V E R  ]</div>
+
+    <div class="handwritten" style="font-size:17px; margin-bottom:20px; color:#1a1a5e;">
+      To whoever is reading this:
+    </div>
+
+    <div class="doc-body" style="font-family: 'IM Fell English', serif; font-style: italic; font-size: 15px; line-height: 1.85;">
+      <p>This file was not supposed to exist. That's not a threat — it's just true. Spray Haven started as a side project and somewhere between the first playtest and the thirteenth crew faction it turned into something I actually want people to play.</p>
+      <p>I'm Christopher Sherlin. Regular person. Loves board games, his wife, and three cats who have never once helped with playtesting despite multiple opportunities.</p>
+      <p>This is my first public release. I am genuinely excited and terrified in equal measure. The game is fun. It might also be broken in places. Both of those things are useful information. All of it helps.</p>
+      <p>If you play it — tell me. Drop a comment, leave a rating, be honest with me. I can take it.</p>
+      <p style="margin-bottom:6px;">Rooftops, alleys, parks, the underground —</p>
+      <p style="font-size:16px; font-weight:bold; font-style:normal; font-family:'Special Elite', serif;">every wall is yours.</p>
+    </div>
+
+    <div class="sticky">
+      "Let the walls bleed color."<br>
+      <span style="font-size:12px; opacity:0.7; display:block; margin-top:6px;">Print on paper or cardstock. Cut. Play.</span>
+    </div>
+
+    <div class="doc-footer">UNFILED — ORIGIN UNKNOWN — INSERTED BY HAND</div>
+  </div>
+
+
+  <!-- ═══════════════════════════════════════════════
+       SHEET 5 — FILE CHECKOUT / DOWNLOAD
+  ═══════════════════════════════════════════════ -->
+  <div class="sheet sheet-5">
+    <span class="stamp stamp-red" style="top:40px; right:55px; font-size:18px;">EVIDENCE</span>
+
+    <div class="section-head">0 5 — F I L E  A C C E S S  /  C H E C K O U T</div>
+
+    <div class="doc-body">
+      <p>This file has been cleared for civilian access. All restricted annexes remain sealed. You are receiving the following materials:</p>
+    </div>
+
+    <div class="checkout-block">
+      <div class="checkout-title">File Checkout — Authorized Materials</div>
+      <div class="checkout-line">
+        <span class="checkout-label">Competitive Rulebook</span>
+        <span class="checkout-value">INCLUDED</span>
+      </div>
+      <div class="checkout-line">
+        <span class="checkout-label">District Tiles (14)</span>
+        <span class="checkout-value">INCLUDED</span>
+      </div>
+      <div class="checkout-line">
+        <span class="checkout-label">Crew Cards (13 factions)</span>
+        <span class="checkout-value">INCLUDED</span>
+      </div>
+      <div class="checkout-line">
+        <span class="checkout-label">Token Sheets</span>
+        <span class="checkout-value">INCLUDED</span>
+      </div>
+      <div class="checkout-line">
+        <span class="checkout-label">Player & Mayor Aids</span>
+        <span class="checkout-value">INCLUDED</span>
+      </div>
+      <div class="checkout-line">
+        <span class="checkout-label">Restricted Crew Dossiers</span>
+        <span class="checkout-value status-open">SEALED — CLEARANCE REQUIRED</span>
+      </div>
+      <div class="checkout-line">
+        <span class="checkout-label">NULL Identity File</span>
+        <span class="checkout-value status-open">OPEN — UNRESOLVED x4</span>
+      </div>
+
+      <div style="margin-top:20px; font-family:'Share Tech Mono', monospace; font-size:11px; opacity:0.55;">Signature — Authorizing Access:</div>
+      <div class="checkout-sig">Christopher Sherlin</div>
+      <div style="font-family:'Share Tech Mono', monospace; font-size:10px; opacity:0.4; margin-top:4px;">Designer / Sole Investigator / Reluctant Mayor</div>
+    </div>
+
+    <div class="field-note" style="margin-top:24px;">
+      <div class="field-note-label">[FIELD NOTE — T. BRYCE // FINAL ENTRY]</div>
+      The file is open. It has always been open. I am told this will be resolved. I have been told this eleven times. The walls are still bleeding. I think that's the point.
+    </div>
+
+    <div class="doc-footer">CONFIDENTIAL — UNAUTHORIZED DISCLOSURE IS A VIOLATION OF CITY ORDINANCE 47-B &nbsp;·&nbsp; FREE TO DOWNLOAD &nbsp;·&nbsp; TIP IF YOU WANT TO SUPPORT DEVELOPMENT</div>
+  </div>
+
+</div>
+
+</body>
+</html>
